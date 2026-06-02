@@ -17,6 +17,7 @@ let autoCopy        = true;
 let autoShorten     = false;
 let currentTabUrl   = null;
 let cache           = []; // [{ url, serviceId, shortUrl }], FIFO
+let failedServices  = new Set();
 
 // ── Cache helpers ─────────────────────────────────────────────────────────────
 function cacheGet(url, serviceId) {
@@ -69,7 +70,7 @@ function applyPillSelection(serviceId) {
 (async () => {
   const [prefs, sessionData, tabs] = await Promise.all([
     chrome.storage.sync.get({ selectedService: services[0].id, autoCopy: true, autoShorten: false }),
-    chrome.storage.session.get({ urlCache: [] }),
+    chrome.storage.session.get({ urlCache: [], failedServices: [] }),
     chrome.tabs.query({ active: true, currentWindow: true }),
   ]);
 
@@ -79,7 +80,15 @@ function applyPillSelection(serviceId) {
     : services[0].id;
   autoCopy    = prefs.autoCopy    ?? true;
   autoShorten = prefs.autoShorten ?? false;
-  cache       = sessionData.urlCache ?? [];
+  cache          = sessionData.urlCache ?? [];
+  failedServices = new Set(sessionData.failedServices ?? []);
+  for (const id of failedServices) {
+    const btn = pillMap.get(id);
+    if (btn) {
+      btn.classList.add('pill-error');
+      btn.title = `${getService(id).name} failed — click to retry`;
+    }
+  }
   currentTabUrl = tabs[0]?.url ?? null;
 
   applyPillSelection(selectedService);
@@ -181,6 +190,17 @@ function setStateError(message) {
   resultArea.appendChild(card);
 }
 
+// ── Pill error mark ───────────────────────────────────────────────────────────
+function markPillError(serviceId) {
+  const btn = pillMap.get(serviceId);
+  if (btn) {
+    btn.classList.add('pill-error');
+    btn.title = `${getService(serviceId).name} failed — click to retry`;
+  }
+  failedServices.add(serviceId);
+  chrome.storage.session.set({ failedServices: [...failedServices] });
+}
+
 // ── Copy helper ───────────────────────────────────────────────────────────────
 function copyToClipboard(text, btn) {
   const doWrite = () => {
@@ -236,6 +256,7 @@ btnShorten.addEventListener('click', async () => {
     cacheSet(url, selectedService, shortUrl);
     setStateSuccess(shortUrl);
   } catch (err) {
+    markPillError(selectedService);
     setStateError(err.message || 'Something went wrong. Please try again.');
   }
 });

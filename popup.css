@@ -260,6 +260,22 @@ body {
   font-weight: 600;
 }
 
+.pill-error {
+  background: #fee2e2;
+  border-color: #f87171;
+  color: #dc2626;
+}
+
+.pill-error:hover:not(.pill-selected) {
+  background: #fecaca;
+}
+
+.pill-error.pill-selected {
+  background: #fecaca;
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+
 /* Toggle labels + tooltips */
 .toggle-label {
   display: flex;
