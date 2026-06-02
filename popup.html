@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ziplink</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- Zone 1: Primary action -->
+  <section class="zone zone-action">
+    <button id="btn-shorten" class="btn-primary" type="button">
+      <span class="btn-icon">🔗</span>
+      <span class="btn-label">Shorten This Page</span>
+    </button>
+  </section>
+
+  <!-- Zone 2: Result area -->
+  <section class="zone zone-result">
+    <div id="result-area" class="result-idle" aria-live="polite">
+      <p class="idle-placeholder">Result will appear here</p>
+    </div>
+  </section>
+
+  <!-- Zone 3: Service pills + auto-copy toggle -->
+  <section class="zone zone-controls" id="controls-row">
+    <div class="pills" role="group" aria-label="URL shortening service">
+      <button class="pill" id="pill-isgd" data-service="isgd" type="button">is.gd</button>
+      <button class="pill" id="pill-vgd" data-service="vgd" type="button">v.gd</button>
+    </div>
+    <label class="toggle-label" for="toggle-autocopy">
+      <span class="toggle-text">Auto-copy</span>
+      <span class="toggle-track">
+        <input type="checkbox" id="toggle-autocopy" role="switch" />
+        <span class="toggle-thumb" aria-hidden="true"></span>
+      </span>
+    </label>
+  </section>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

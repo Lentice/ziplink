@@ -1,0 +1,299 @@
+/* ── Reset & base ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 300px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  color: #1e293b;
+  background: #ffffff;
+}
+
+/* ── Zones ────────────────────────────────────────────────── */
+.zone {
+  padding: 12px 14px;
+}
+
+.zone + .zone {
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ── Zone 1: Primary button ───────────────────────────────── */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: #0ea5e9;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0284c7;
+}
+
+.btn-primary:active:not(:disabled) {
+  background: #0369a1;
+}
+
+.btn-primary:disabled {
+  background: #7dd3fc;
+  cursor: not-allowed;
+  opacity: 1; /* opacity handled by class below */
+}
+
+.btn-primary.loading {
+  opacity: 0.85;
+}
+
+.btn-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ── Zone 2: Result area ──────────────────────────────────── */
+.zone-result {
+  min-height: 72px;
+  display: flex;
+  align-items: stretch;
+}
+
+#result-area {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Idle state */
+.result-idle .idle-placeholder {
+  color: #cbd5e1;
+  text-align: center;
+  font-size: 13px;
+  user-select: none;
+}
+
+/* Loading state */
+.result-loading {
+  align-items: center;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.spinner {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  animation: spin 0.8s linear infinite;
+  color: #0ea5e9;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* Success state */
+.result-success {
+  gap: 6px;
+}
+
+.result-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.result-card {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-url {
+  flex: 1;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 500;
+  word-break: break-all;
+  text-decoration: none;
+}
+
+.result-url:hover {
+  text-decoration: underline;
+}
+
+.btn-copy {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #0ea5e9;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-copy:hover {
+  background: #0284c7;
+}
+
+.btn-copy.copied {
+  background: #22c55e;
+  cursor: default;
+}
+
+/* Error state */
+.result-error {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.error-card {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.error-icon {
+  flex-shrink: 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 13px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* ── Zone 3: Controls row ─────────────────────────────────── */
+.zone-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.zone-controls.locked {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Service pills */
+.pills {
+  display: flex;
+  gap: 6px;
+}
+
+.pill {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.pill:hover:not(.pill-selected) {
+  background: #e2e8f0;
+}
+
+.pill-selected {
+  background: #e0f2fe;
+  border-color: #0369a1;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+/* Auto-copy toggle */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-text {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.toggle-track {
+  position: relative;
+  width: 32px;
+  height: 18px;
+}
+
+.toggle-track input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.toggle-thumb {
+  position: absolute;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 20px;
+  transition: background 0.2s;
+}
+
+.toggle-thumb::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggle-track input:checked + .toggle-thumb {
+  background: #0ea5e9;
+}
+
+.toggle-track input:checked + .toggle-thumb::after {
+  transform: translateX(14px);
+}
