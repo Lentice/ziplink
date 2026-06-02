@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Ziplink",
+  "version": "1.0.0",
+  "description": "Shorten the current page URL instantly using is.gd or v.gd. Result auto-copied to your clipboard.",
+  "permissions": ["activeTab", "clipboardWrite", "storage"],
+  "host_permissions": ["https://is.gd/*", "https://v.gd/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Ziplink — Shorten This Page"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
