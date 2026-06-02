@@ -221,6 +221,12 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  animation: pillsFadeIn 120ms ease;
+}
+
+@keyframes pillsFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .pill {
