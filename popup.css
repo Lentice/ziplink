@@ -75,6 +75,8 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  max-height: 120px;
+  overflow-y: auto;
 }
 
 /* Idle state */

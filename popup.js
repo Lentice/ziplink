@@ -1,6 +1,8 @@
 // popup.js — Ziplink popup logic (ES module)
 import { services, getService } from './services/registry.js';
 
+const CACHE_MAX = 20;
+
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const btnShorten     = document.getElementById('btn-shorten');
 const resultArea     = document.getElementById('result-area');
@@ -14,7 +16,7 @@ let selectedService = services[0].id;
 let autoCopy        = true;
 let autoShorten     = false;
 let currentTabUrl   = null;
-let cache           = []; // [{ url, serviceId, shortUrl }], max 20, FIFO
+let cache           = []; // [{ url, serviceId, shortUrl }], FIFO
 
 // ── Cache helpers ─────────────────────────────────────────────────────────────
 function cacheGet(url, serviceId) {
@@ -23,7 +25,7 @@ function cacheGet(url, serviceId) {
 
 function cacheSet(url, serviceId, shortUrl) {
   cache = cache.filter(e => !(e.url === url && e.serviceId === serviceId));
-  if (cache.length >= 20) cache.shift();
+  if (cache.length >= CACHE_MAX) cache.shift();
   cache.push({ url, serviceId, shortUrl });
   chrome.storage.session.set({ urlCache: cache });
 }
