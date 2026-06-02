@@ -22,7 +22,7 @@ body {
   border-top: 1px solid #e2e8f0;
 }
 
-/* ── Zone 1: Primary button ───────────────────────────────── */
+/* ── Zone 1: Primary action ───────────────────────────────── */
 .btn-primary {
   display: flex;
   align-items: center;
