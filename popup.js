@@ -201,6 +201,16 @@ function markPillError(serviceId) {
   chrome.storage.session.set({ failedServices: [...failedServices] });
 }
 
+function clearPillError(serviceId) {
+  const btn = pillMap.get(serviceId);
+  if (btn) {
+    btn.classList.remove('pill-error');
+    btn.title = '';
+  }
+  failedServices.delete(serviceId);
+  chrome.storage.session.set({ failedServices: [...failedServices] });
+}
+
 // ── Copy helper ───────────────────────────────────────────────────────────────
 function copyToClipboard(text, btn) {
   const doWrite = () => {
@@ -254,6 +264,7 @@ btnShorten.addEventListener('click', async () => {
   try {
     const shortUrl = await getService(selectedService).shorten(url);
     cacheSet(url, selectedService, shortUrl);
+    clearPillError(selectedService);
     setStateSuccess(shortUrl);
   } catch (err) {
     markPillError(selectedService);
