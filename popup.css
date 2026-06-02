@@ -203,9 +203,12 @@ body {
 /* ── Zone 3: Controls row ─────────────────────────────────── */
 .zone-controls {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 8px;
+}
+
+.zone-controls .toggle-label {
+  align-self: flex-end;
 }
 
 .zone-controls.locked {
