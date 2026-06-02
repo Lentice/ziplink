@@ -8,6 +8,9 @@ const pillIsgd     = document.getElementById('pill-isgd');
 const pillVgd      = document.getElementById('pill-vgd');
 const pillTinyurl  = document.getElementById('pill-tinyurl');
 const pillSpoome   = document.getElementById('pill-spoome');
+const pillCleanuri = document.getElementById('pill-cleanuri');
+const pillDagd     = document.getElementById('pill-dagd');
+const pillClckru   = document.getElementById('pill-clckru');
 const toggleAuto   = document.getElementById('toggle-autocopy');
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -33,13 +36,19 @@ function applyPillSelection(serviceId) {
   pillIsgd.classList.toggle('pill-selected',    serviceId === 'isgd');
   pillVgd.classList.toggle('pill-selected',     serviceId === 'vgd');
   pillTinyurl.classList.toggle('pill-selected', serviceId === 'tinyurl');
-  pillSpoome.classList.toggle('pill-selected',  serviceId === 'spoome');
+  pillSpoome.classList.toggle('pill-selected',   serviceId === 'spoome');
+  pillCleanuri.classList.toggle('pill-selected', serviceId === 'cleanuri');
+  pillDagd.classList.toggle('pill-selected',     serviceId === 'dagd');
+  pillClckru.classList.toggle('pill-selected',   serviceId === 'clckru');
 }
 
 function getServiceName(serviceId) {
   if (serviceId === 'vgd') return 'v.gd';
   if (serviceId === 'tinyurl') return 'TinyURL';
   if (serviceId === 'spoome') return 'spoo.me';
+  if (serviceId === 'cleanuri') return 'CleanURI';
+  if (serviceId === 'dagd') return 'da.gd';
+  if (serviceId === 'clckru') return 'Clck.ru';
   return 'is.gd';
 }
 
@@ -149,7 +158,7 @@ function copyToClipboard(text, btn) {
 }
 
 // ── Service pill clicks ───────────────────────────────────────────────────────
-[pillIsgd, pillVgd, pillTinyurl, pillSpoome].forEach((pill) => {
+[pillIsgd, pillVgd, pillTinyurl, pillSpoome, pillCleanuri, pillDagd, pillClckru].forEach((pill) => {
   pill.addEventListener('click', () => {
     const svc = pill.dataset.service;
     if (svc === selectedService) return;

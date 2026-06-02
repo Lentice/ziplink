@@ -219,6 +219,7 @@ body {
 /* Service pills */
 .pills {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 

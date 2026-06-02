@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Shorten the current page URL instantly using is.gd or v.gd. Result auto-copied to your clipboard.",
   "permissions": ["activeTab", "clipboardWrite", "storage"],
-  "host_permissions": ["https://is.gd/*", "https://v.gd/*", "https://tinyurl.com/*", "https://spoo.me/*"],
+  "host_permissions": ["https://is.gd/*", "https://v.gd/*", "https://tinyurl.com/*", "https://spoo.me/*", "https://cleanuri.com/*", "https://da.gd/*", "https://clck.ru/*"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
