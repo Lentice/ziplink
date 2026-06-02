@@ -133,7 +133,8 @@ function copyToClipboard(text, btn) {
       btn.disabled = false;
     }, 2000);
   }).catch(() => {
-    // Clipboard write failed silently — button stays as "Copy"
+    btn.textContent = 'Copy failed';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
   });
 }
 
