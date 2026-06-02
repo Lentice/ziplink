@@ -27,19 +27,24 @@
   <!-- Zone 3: Service pills + auto-copy toggle -->
   <section class="zone zone-controls" id="controls-row">
     <div class="pills" id="pills-container" role="group" aria-label="URL shortening service">
+      <!-- Pills will be injected here -->
     </div>
     <div class="toggles-row">
-      <label class="toggle-label" for="toggle-autoshorten">
+      <label class="toggle-label" for="toggle-autoshorten"
+        data-tooltip="Automatically shorten the URL when the popup opens">
         <span class="toggle-text">Auto-shorten</span>
         <span class="toggle-track">
-          <input type="checkbox" id="toggle-autoshorten" role="switch" />
+          <input type="checkbox" id="toggle-autoshorten" role="switch"
+            aria-label="Automatically shorten the URL when the popup opens" />
           <span class="toggle-thumb" aria-hidden="true"></span>
         </span>
       </label>
-      <label class="toggle-label" for="toggle-autocopy">
+      <label class="toggle-label" for="toggle-autocopy"
+        data-tooltip="Automatically copy the shortened URL to clipboard">
         <span class="toggle-text">Auto-copy</span>
         <span class="toggle-track">
-          <input type="checkbox" id="toggle-autocopy" role="switch" />
+          <input type="checkbox" id="toggle-autocopy" role="switch"
+            aria-label="Automatically copy the shortened URL to clipboard" />
           <span class="toggle-thumb" aria-hidden="true"></span>
         </span>
       </label>
