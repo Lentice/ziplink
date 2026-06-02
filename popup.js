@@ -1,56 +1,64 @@
 // popup.js — Ziplink popup logic (ES module)
+import { services, getService } from './services/registry.js';
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
-const btnShorten   = document.getElementById('btn-shorten');
-const resultArea   = document.getElementById('result-area');
-const controlsRow  = document.getElementById('controls-row');
-const pillIsgd     = document.getElementById('pill-isgd');
-const pillVgd      = document.getElementById('pill-vgd');
-const pillTinyurl  = document.getElementById('pill-tinyurl');
-const pillSpoome   = document.getElementById('pill-spoome');
-const pillCleanuri = document.getElementById('pill-cleanuri');
-const pillDagd     = document.getElementById('pill-dagd');
-const pillClckru   = document.getElementById('pill-clckru');
-const toggleAuto   = document.getElementById('toggle-autocopy');
+const btnShorten     = document.getElementById('btn-shorten');
+const resultArea     = document.getElementById('result-area');
+const controlsRow    = document.getElementById('controls-row');
+const pillsContainer = document.getElementById('pills-container');
+const toggleAuto     = document.getElementById('toggle-autocopy');
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let selectedService = 'isgd';
+let selectedService = services[0].id;
 let autoCopy        = true;
+
+// ── Pills init ────────────────────────────────────────────────────────────────
+function initPills() {
+  const map = new Map();
+  for (const svc of services) {
+    const btn = document.createElement('button');
+    btn.className = 'pill';
+    btn.dataset.service = svc.id;
+    btn.type = 'button';
+    btn.textContent = svc.name;
+    btn.addEventListener('click', () => {
+      if (svc.id === selectedService) return;
+      selectedService = svc.id;
+      applyPillSelection(selectedService);
+      chrome.storage.sync.set({ selectedService });
+      setStateIdle();
+    });
+    pillsContainer.appendChild(btn);
+    map.set(svc.id, btn);
+  }
+  return map;
+}
+
+const pillMap = initPills();
+
+// ── Pill selection ────────────────────────────────────────────────────────────
+function applyPillSelection(serviceId) {
+  for (const [id, btn] of pillMap) {
+    btn.classList.toggle('pill-selected', id === serviceId);
+  }
+}
 
 // ── Init: load persisted prefs ────────────────────────────────────────────────
 chrome.storage.sync.get(
-  { selectedService: 'isgd', autoCopy: true },
+  { selectedService: services[0].id, autoCopy: true },
   (prefs) => {
     if (chrome.runtime.lastError) {
       console.warn('[Ziplink] Storage read failed, using defaults:', chrome.runtime.lastError.message);
     }
-    selectedService = prefs.selectedService ?? 'isgd';
-    autoCopy        = prefs.autoCopy ?? true;
+    const knownIds = services.map(s => s.id);
+    selectedService = knownIds.includes(prefs.selectedService)
+      ? prefs.selectedService
+      : services[0].id;
+    autoCopy = prefs.autoCopy ?? true;
     applyPillSelection(selectedService);
     toggleAuto.checked = autoCopy;
   }
 );
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-function applyPillSelection(serviceId) {
-  pillIsgd.classList.toggle('pill-selected',    serviceId === 'isgd');
-  pillVgd.classList.toggle('pill-selected',     serviceId === 'vgd');
-  pillTinyurl.classList.toggle('pill-selected', serviceId === 'tinyurl');
-  pillSpoome.classList.toggle('pill-selected',   serviceId === 'spoome');
-  pillCleanuri.classList.toggle('pill-selected', serviceId === 'cleanuri');
-  pillDagd.classList.toggle('pill-selected',     serviceId === 'dagd');
-  pillClckru.classList.toggle('pill-selected',   serviceId === 'clckru');
-}
-
-function getServiceName(serviceId) {
-  if (serviceId === 'vgd') return 'v.gd';
-  if (serviceId === 'tinyurl') return 'TinyURL';
-  if (serviceId === 'spoome') return 'spoo.me';
-  if (serviceId === 'cleanuri') return 'CleanURI';
-  if (serviceId === 'dagd') return 'da.gd';
-  if (serviceId === 'clckru') return 'Clck.ru';
-  return 'is.gd';
-}
 
 // ── State renderers ───────────────────────────────────────────────────────────
 function setStateIdle() {
@@ -68,7 +76,7 @@ function setStateLoading(serviceId) {
     <svg class="spinner" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31.416" stroke-dashoffset="10" stroke-linecap="round"/>
     </svg>
-    <span class="loading-text">Contacting ${getServiceName(serviceId)}...</span>
+    <span class="loading-text">Contacting ${getService(serviceId).name}...</span>
   `;
 }
 
@@ -157,18 +165,6 @@ function copyToClipboard(text, btn) {
   });
 }
 
-// ── Service pill clicks ───────────────────────────────────────────────────────
-[pillIsgd, pillVgd, pillTinyurl, pillSpoome, pillCleanuri, pillDagd, pillClckru].forEach((pill) => {
-  pill.addEventListener('click', () => {
-    const svc = pill.dataset.service;
-    if (svc === selectedService) return;
-    selectedService = svc;
-    applyPillSelection(selectedService);
-    chrome.storage.sync.set({ selectedService });
-    setStateIdle();
-  });
-});
-
 // ── Auto-copy toggle ──────────────────────────────────────────────────────────
 toggleAuto.addEventListener('change', () => {
   autoCopy = toggleAuto.checked;
@@ -190,7 +186,6 @@ btnShorten.addEventListener('click', async () => {
   }
 
   try {
-    const { getService } = await import('./services/registry.js');
     const shortUrl = await getService(selectedService).shorten(url);
     setStateSuccess(shortUrl);
   } catch (err) {
