@@ -26,6 +26,8 @@ services/
 
 `popup.js` static-imports `{ services, getService }` from `registry.js` at module load. Service pills are generated dynamically from the `services` array — `initPills()` creates `<button>` elements and returns a `Map<id, HTMLElement>` used by `applyPillSelection()`. User prefs (`selectedService`, `autoCopy`) are persisted via `chrome.storage.sync`.
 
+`popup.html` declares `<link rel="modulepreload">` for `popup.js` and `registry.js` so Chrome fetches and compiles both modules during HTML parse, minimising the pill-render delay on popup open.
+
 **Adding a new shortening service:**
 1. Create `services/newservice.js` implementing the contract above
 2. Import and add it to the `services` array in `registry.js`
