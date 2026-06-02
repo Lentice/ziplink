@@ -11,7 +11,8 @@
     "https://spoo.me/*",
     "https://cleanuri.com/*",
     "https://da.gd/*",
-    "https://clck.ru/*"
+    "https://clck.ru/*",
+    "https://shrtr.top/*"
   ],
   "action": {
     "default_popup": "popup.html",
