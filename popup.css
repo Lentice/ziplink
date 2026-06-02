@@ -212,6 +212,7 @@ body {
 .toggles-row {
   display: flex;
   gap: 12px;
+  justify-content: flex-end;
   align-self: flex-end;
   border-top: 1px solid #e2e8f0;
   padding-top: 8px;
