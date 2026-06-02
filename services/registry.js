@@ -2,4 +2,8 @@ import isgd from './isgd.js';
 import vgd from './vgd.js';
 
 export const services = [isgd, vgd];
-export const getService = (id) => services.find(s => s.id === id) ?? isgd;
+export const getService = (id) => {
+  const svc = services.find(s => s.id === id);
+  if (!svc) console.warn(`[Ziplink] Unknown service id: "${id}", falling back to isgd`);
+  return svc ?? isgd;
+};
