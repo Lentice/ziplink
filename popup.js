@@ -16,8 +16,11 @@ let autoCopy        = true;
 chrome.storage.sync.get(
   { selectedService: 'isgd', autoCopy: true },
   (prefs) => {
-    selectedService = prefs.selectedService;
-    autoCopy        = prefs.autoCopy;
+    if (chrome.runtime.lastError) {
+      console.warn('[Ziplink] Storage read failed, using defaults:', chrome.runtime.lastError.message);
+    }
+    selectedService = prefs.selectedService ?? 'isgd';
+    autoCopy        = prefs.autoCopy ?? true;
     applyPillSelection(selectedService);
     toggleAuto.checked = autoCopy;
   }
