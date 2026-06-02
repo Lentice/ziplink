@@ -28,13 +28,22 @@
   <section class="zone zone-controls" id="controls-row">
     <div class="pills" id="pills-container" role="group" aria-label="URL shortening service">
     </div>
-    <label class="toggle-label" for="toggle-autocopy">
-      <span class="toggle-text">Auto-copy</span>
-      <span class="toggle-track">
-        <input type="checkbox" id="toggle-autocopy" role="switch" />
-        <span class="toggle-thumb" aria-hidden="true"></span>
-      </span>
-    </label>
+    <div class="toggles-row">
+      <label class="toggle-label" for="toggle-autoshorten">
+        <span class="toggle-text">Auto-shorten</span>
+        <span class="toggle-track">
+          <input type="checkbox" id="toggle-autoshorten" role="switch" />
+          <span class="toggle-thumb" aria-hidden="true"></span>
+        </span>
+      </label>
+      <label class="toggle-label" for="toggle-autocopy">
+        <span class="toggle-text">Auto-copy</span>
+        <span class="toggle-track">
+          <input type="checkbox" id="toggle-autocopy" role="switch" />
+          <span class="toggle-thumb" aria-hidden="true"></span>
+        </span>
+      </label>
+    </div>
   </section>
 
   <script type="module" src="popup.js"></script>

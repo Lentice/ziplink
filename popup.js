@@ -6,11 +6,27 @@ const btnShorten     = document.getElementById('btn-shorten');
 const resultArea     = document.getElementById('result-area');
 const controlsRow    = document.getElementById('controls-row');
 const pillsContainer = document.getElementById('pills-container');
-const toggleAuto     = document.getElementById('toggle-autocopy');
+const toggleAuto        = document.getElementById('toggle-autocopy');
+const toggleAutoShorten = document.getElementById('toggle-autoshorten');
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let selectedService = services[0].id;
 let autoCopy        = true;
+let autoShorten     = false;
+let currentTabUrl   = null;
+let cache           = []; // [{ url, serviceId, shortUrl }], max 20, FIFO
+
+// ── Cache helpers ─────────────────────────────────────────────────────────────
+function cacheGet(url, serviceId) {
+  return cache.find(e => e.url === url && e.serviceId === serviceId)?.shortUrl ?? null;
+}
+
+function cacheSet(url, serviceId, shortUrl) {
+  cache = cache.filter(e => !(e.url === url && e.serviceId === serviceId));
+  if (cache.length >= 20) cache.shift();
+  cache.push({ url, serviceId, shortUrl });
+  chrome.storage.session.set({ urlCache: cache });
+}
 
 // ── Pills init ────────────────────────────────────────────────────────────────
 function initPills() {
@@ -26,6 +42,10 @@ function initPills() {
       selectedService = svc.id;
       applyPillSelection(selectedService);
       chrome.storage.sync.set({ selectedService });
+      if (currentTabUrl) {
+        const cached = cacheGet(currentTabUrl, selectedService);
+        if (cached) { setStateSuccess(cached); return; }
+      }
       setStateIdle();
     });
     pillsContainer.appendChild(btn);
@@ -43,22 +63,33 @@ function applyPillSelection(serviceId) {
   }
 }
 
-// ── Init: load persisted prefs ────────────────────────────────────────────────
-chrome.storage.sync.get(
-  { selectedService: services[0].id, autoCopy: true },
-  (prefs) => {
-    if (chrome.runtime.lastError) {
-      console.warn('[Ziplink] Storage read failed, using defaults:', chrome.runtime.lastError.message);
-    }
-    const knownIds = services.map(s => s.id);
-    selectedService = knownIds.includes(prefs.selectedService)
-      ? prefs.selectedService
-      : services[0].id;
-    autoCopy = prefs.autoCopy ?? true;
-    applyPillSelection(selectedService);
-    toggleAuto.checked = autoCopy;
+// ── Init: load prefs, cache, and tab URL in parallel ─────────────────────────
+(async () => {
+  const [prefs, sessionData, tabs] = await Promise.all([
+    chrome.storage.sync.get({ selectedService: services[0].id, autoCopy: true, autoShorten: false }),
+    chrome.storage.session.get({ urlCache: [] }),
+    chrome.tabs.query({ active: true, currentWindow: true }),
+  ]);
+
+  const knownIds = services.map(s => s.id);
+  selectedService = knownIds.includes(prefs.selectedService)
+    ? prefs.selectedService
+    : services[0].id;
+  autoCopy    = prefs.autoCopy    ?? true;
+  autoShorten = prefs.autoShorten ?? false;
+  cache       = sessionData.urlCache ?? [];
+  currentTabUrl = tabs[0]?.url ?? null;
+
+  applyPillSelection(selectedService);
+  toggleAuto.checked        = autoCopy;
+  toggleAutoShorten.checked = autoShorten;
+
+  if (currentTabUrl) {
+    const cached = cacheGet(currentTabUrl, selectedService);
+    if (cached) { setStateSuccess(cached); return; }
   }
-);
+  if (autoShorten) btnShorten.click();
+})();
 
 // ── State renderers ───────────────────────────────────────────────────────────
 function setStateIdle() {
@@ -150,22 +181,34 @@ function setStateError(message) {
 
 // ── Copy helper ───────────────────────────────────────────────────────────────
 function copyToClipboard(text, btn) {
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✓ Copied';
-    btn.classList.add('copied');
-    btn.disabled = true;
-    setTimeout(() => {
-      btn.textContent = 'Copy';
-      btn.classList.remove('copied');
-      btn.disabled = false;
-    }, 2000);
-  }).catch(() => {
-    btn.textContent = 'Copy failed';
-    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
-  });
+  const doWrite = () => {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copied';
+      btn.classList.add('copied');
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+        btn.disabled = false;
+      }, 2000);
+    }).catch(() => {
+      btn.textContent = 'Copy failed';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    });
+  };
+  if (document.hasFocus()) {
+    doWrite();
+  } else {
+    window.addEventListener('focus', doWrite, { once: true });
+  }
 }
 
-// ── Auto-copy toggle ──────────────────────────────────────────────────────────
+// ── Toggle listeners ──────────────────────────────────────────────────────────
+toggleAutoShorten.addEventListener('change', () => {
+  autoShorten = toggleAutoShorten.checked;
+  chrome.storage.sync.set({ autoShorten });
+});
+
 toggleAuto.addEventListener('change', () => {
   autoCopy = toggleAuto.checked;
   chrome.storage.sync.set({ autoCopy });
@@ -173,20 +216,22 @@ toggleAuto.addEventListener('change', () => {
 
 // ── Main button: shorten ──────────────────────────────────────────────────────
 btnShorten.addEventListener('click', async () => {
-  setStateLoading(selectedService);
-
-  let url;
-  try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    url = tab?.url;
-    if (!url) throw new Error('Could not read the current tab URL.');
-  } catch (err) {
-    setStateError(err.message || 'Could not access the current tab.');
+  const url = currentTabUrl;
+  if (!url) {
+    setStateError('Could not read the current tab URL.');
     return;
   }
 
+  const cached = cacheGet(url, selectedService);
+  if (cached) {
+    setStateSuccess(cached);
+    return;
+  }
+
+  setStateLoading(selectedService);
   try {
     const shortUrl = await getService(selectedService).shorten(url);
+    cacheSet(url, selectedService, shortUrl);
     setStateSuccess(shortUrl);
   } catch (err) {
     setStateError(err.message || 'Something went wrong. Please try again.');
