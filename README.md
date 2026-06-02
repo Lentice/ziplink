@@ -4,6 +4,8 @@ Chrome extension (Manifest V3) that shortens the current tab's URL in one click.
 
 No build step. No bundler. No dependencies. Chrome loads the files directly as ES modules.
 
+![Ziplink popup screenshot](assets/screenshot.png)
+
 ## Install (development)
 
 1. Open `chrome://extensions`
