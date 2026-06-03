@@ -19,6 +19,21 @@ let currentTabUrl   = null;
 let cache           = []; // [{ url, serviceId, shortUrl }], FIFO
 let failedServices  = new Set();
 
+// ── URL validation ────────────────────────────────────────────────────────────
+function isShortenableUrl(url) {
+  if (!url) return { ok: false, reason: 'Could not read the current tab URL.' };
+  try {
+    const { protocol } = new URL(url);
+    if (protocol !== 'http:' && protocol !== 'https:') {
+      const scheme = protocol.slice(0, -1);
+      return { ok: false, reason: `Cannot shorten ${scheme}:// pages — only http and https URLs are supported.` };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, reason: 'Invalid URL.' };
+  }
+}
+
 // ── Cache helpers ─────────────────────────────────────────────────────────────
 function cacheGet(url, serviceId) {
   return cache.find(e => e.url === url && e.serviceId === serviceId)?.shortUrl ?? null;
@@ -95,10 +110,14 @@ function applyPillSelection(serviceId) {
   toggleAuto.checked        = autoCopy;
   toggleAutoShorten.checked = autoShorten;
 
-  if (currentTabUrl) {
-    const cached = cacheGet(currentTabUrl, selectedService);
-    if (cached) { setStateSuccess(cached); return; }
+  const urlCheck = isShortenableUrl(currentTabUrl);
+  if (!urlCheck.ok) {
+    setStateError(urlCheck.reason);
+    btnShorten.disabled = true;
+    return;
   }
+  const cached = cacheGet(currentTabUrl, selectedService);
+  if (cached) { setStateSuccess(cached); return; }
   if (autoShorten) btnShorten.click();
 })();
 
@@ -249,8 +268,9 @@ toggleAuto.addEventListener('change', () => {
 // ── Main button: shorten ──────────────────────────────────────────────────────
 btnShorten.addEventListener('click', async () => {
   const url = currentTabUrl;
-  if (!url) {
-    setStateError('Could not read the current tab URL.');
+  const urlCheck = isShortenableUrl(url);
+  if (!urlCheck.ok) {
+    setStateError(urlCheck.reason);
     return;
   }
 
