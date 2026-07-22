@@ -36,10 +36,11 @@ Toggle **Auto-copy** off to copy manually. Selected service and auto-copy prefer
 | is.gd | `https://is.gd/` |
 | v.gd | `https://v.gd/` |
 | TinyURL | `https://tinyurl.com/` |
-| spoo.me | `https://spoo.me/` |
 | CleanURI | `https://cleanuri.com/` |
 | da.gd | `https://da.gd/` |
 | Clck.ru | `https://clck.ru/` |
+| Shrtr | `https://shrtr.top/` |
+| Ulvis | `https://ulvis.net/` |
 
 ## Adding a service
 

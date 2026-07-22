@@ -2,17 +2,17 @@
   "manifest_version": 3,
   "name": "Ziplink",
   "version": "1.0.0",
-  "description": "Shorten the current page URL instantly using is.gd or v.gd. Result auto-copied to your clipboard.",
+  "description": "Shorten the current page URL instantly using your preferred shortening service.",
   "permissions": ["activeTab", "clipboardWrite", "storage"],
   "host_permissions": [
     "https://is.gd/*",
     "https://v.gd/*",
     "https://tinyurl.com/*",
-    "https://spoo.me/*",
     "https://cleanuri.com/*",
     "https://da.gd/*",
     "https://clck.ru/*",
-    "https://shrtr.top/*"
+    "https://shrtr.top/*",
+    "https://ulvis.net/*"
   ],
   "action": {
     "default_popup": "popup.html",
