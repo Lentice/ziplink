@@ -35,12 +35,12 @@ Toggle **Auto-copy** off to copy manually. Selected service and auto-copy prefer
 |---------|--------|
 | is.gd | `https://is.gd/` |
 | v.gd | `https://v.gd/` |
-| TinyURL | `https://tinyurl.com/` |
-| CleanURI | `https://cleanuri.com/` |
 | da.gd | `https://da.gd/` |
 | Clck.ru | `https://clck.ru/` |
 | Shrtr | `https://shrtr.top/` |
 | Ulvis | `https://ulvis.net/` |
+| HideURI | `https://hideuri.com/` |
+| clc.is | `https://clc.is/` |
 
 ## Adding a service
 

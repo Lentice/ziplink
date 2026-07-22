@@ -7,12 +7,12 @@
   "host_permissions": [
     "https://is.gd/*",
     "https://v.gd/*",
-    "https://tinyurl.com/*",
-    "https://cleanuri.com/*",
     "https://da.gd/*",
     "https://clck.ru/*",
     "https://shrtr.top/*",
-    "https://ulvis.net/*"
+    "https://ulvis.net/*",
+    "https://hideuri.com/*",
+    "https://clc.is/*"
   ],
   "action": {
     "default_popup": "popup.html",

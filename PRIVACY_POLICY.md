@@ -20,12 +20,12 @@ Ziplink supports the following third-party URL shortening services:
 
 - is.gd (`is.gd`)
 - v.gd (`v.gd`)
-- TinyURL (`tinyurl.com`)
-- CleanURI (`cleanuri.com`)
 - da.gd (`da.gd`)
 - Clck.ru (`clck.ru`)
 - Shrtr (`shrtr.top`)
 - Ulvis (`ulvis.net`)
+- HideURI (`hideuri.com`)
+- clc.is (`clc.is`)
 
 When you shorten a URL, the selected third party processes it under its own terms and privacy policy.
 
@@ -63,7 +63,7 @@ For questions, open an issue on the extension's GitHub repository.
   <p>Ziplink does not collect, store, or transmit any personal data. When you shorten a URL, it is sent directly from your browser to the third-party URL shortening service you selected. No data passes through our servers.</p>
   <p>Your preferences (selected service, auto-copy setting) are stored locally in Chrome's sync storage and are not accessible to us.</p>
   <h2>Third-Party Services</h2>
-  <p>Ziplink supports is.gd, v.gd, TinyURL, CleanURI, da.gd, Clck.ru, Shrtr, and Ulvis. Shortened URLs are processed by the selected service under its own terms and privacy policy.</p>
+  <p>Ziplink supports is.gd, v.gd, da.gd, Clck.ru, Shrtr, Ulvis, HideURI, and clc.is. Shortened URLs are processed by the selected service under its own terms and privacy policy.</p>
 </body>
 </html>
 ```
