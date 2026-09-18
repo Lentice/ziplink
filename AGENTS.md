@@ -1,6 +1,6 @@
 ## Project
 
-Ziplink is a Chrome extension (Manifest V3) that shortens the current tab's URL via is.gd or v.gd. No build step, no bundler, no package manager — Chrome loads the files directly as ES modules.
+Ziplink is a Chrome extension (Manifest V3) that shortens the current tab's URL via one of eight third-party shortening services. No build step, no bundler, no package manager — Chrome loads the files directly as ES modules.
 
 
 ## Architecture
@@ -11,11 +11,13 @@ services/
   registry.js   — services array + getService(id) lookup with fallback to first service
   isgd.js       — is.gd API adapter
   vgd.js        — v.gd API adapter
-  tinyurl.js    — TinyURL API adapter
-  spoome.js     — spoo.me API adapter
-  cleanuri.js   — CleanURI API adapter
   dagd.js       — da.gd API adapter
   clckru.js     — Clck.ru API adapter
+  shrtr.js      — Shrtr API adapter
+  ulvis.js      — Ulvis API adapter
+  hideuri.js    — HideURI API adapter
+  clcis.js      — clc.is API adapter
+tests/          — node:test suites, run with `node --test tests/*.mjs`
 ```
 
 **Service contract** — every service module exports a default object:
@@ -23,8 +25,12 @@ services/
 { id: string, name: string, shorten(url): Promise<string> }
 // shorten() must return the short URL or throw an Error with a human-readable message
 ```
+`popup.js` validates every returned URL against `https://` before rendering it, so an
+adapter need not re-check the scheme — but it must still throw when the service reports
+an error or returns nothing usable. `popup.js` also applies an 8s timeout
+(`REQUEST_TIMEOUT_MS`) around `shorten()`, so adapters do not need their own.
 
-`popup.js` static-imports `{ services, getService }` from `registry.js` at module load. Service pills are generated dynamically from the `services` array — `initPills()` creates `<button>` elements and returns a `Map<id, HTMLElement>` used by `applyPillSelection()`. User prefs (`selectedService`, `autoCopy`) are persisted via `chrome.storage.sync`.
+`popup.js` static-imports `{ services, getService }` from `registry.js` at module load. Service pills are generated dynamically from the `services` array — `initPills()` creates `<button>` elements and returns a `Map<id, HTMLElement>` used by `applyPillSelection()`. User prefs (`selectedService`, `autoCopy`, `autoShorten`) are persisted via `chrome.storage.sync`; the short-URL cache and the set of failed services live in `chrome.storage.session`.
 
 `popup.html` declares `<link rel="modulepreload">` for `popup.js` and `registry.js` so Chrome fetches and compiles both modules during HTML parse, minimising the pill-render delay on popup open.
 
@@ -32,6 +38,7 @@ services/
 1. Create `services/newservice.js` implementing the contract above
 2. Import and add it to the `services` array in `registry.js`
 3. Add the service domain to `host_permissions` in `manifest.json`
+4. Add a `tests/newservice.test.mjs` covering success, HTTP failure, and a response with no short URL
 
 The popup generates pills dynamically from `services` — no other changes needed.
 
@@ -150,6 +157,7 @@ When multiple valid approaches exist, choose based on:
 
 ### Tooling
 
+- Tests: `node --test tests/*.mjs` (the glob is required — Node skips `.mjs` under a bare directory argument)
 - Use project's existing build system
 - Use project's test framework
 - Use project's formatter/linter settings

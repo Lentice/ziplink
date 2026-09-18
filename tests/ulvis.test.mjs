@@ -28,3 +28,15 @@ test('Ulvis rejects a response that does not contain a short URL', async (t) => 
     { message: 'Ulvis returned no short URL' },
   );
 });
+
+test('Ulvis requests plain-text mode, which is what the parser expects', async (t) => {
+  let requested;
+  t.mock.method(globalThis, 'fetch', async (input) => {
+    requested = new URL(input);
+    return new Response('https://ulvis.net/aDSh');
+  });
+
+  await ulvis.shorten('https://example.com/article');
+
+  assert.equal(requested.searchParams.get('type'), null);
+});
