@@ -2,6 +2,15 @@
 import { services, getService } from './services/registry.js';
 
 const CACHE_MAX = 20;
+const REQUEST_TIMEOUT_MS = 8000;
+
+function withTimeout(promise, serviceName) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`${serviceName} did not respond in time`)), REQUEST_TIMEOUT_MS)),
+  ]);
+}
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const btnShorten     = document.getElementById('btn-shorten');
@@ -127,10 +136,17 @@ function setStateIdle() {
   resultArea.innerHTML = '<p class="idle-placeholder">Result will appear here</p>';
 }
 
+function setControlsDisabled(disabled) {
+  for (const btn of pillMap.values()) btn.disabled = disabled;
+  toggleAuto.disabled = disabled;
+  toggleAutoShorten.disabled = disabled;
+}
+
 function setStateLoading(serviceId) {
   btnShorten.disabled = true;
   btnShorten.classList.add('loading');
   controlsRow.classList.add('locked');
+  setControlsDisabled(true);
 
   resultArea.className = 'result-loading';
   resultArea.innerHTML = `
@@ -145,6 +161,7 @@ function setStateSuccess(shortUrl) {
   btnShorten.disabled = false;
   btnShorten.classList.remove('loading');
   controlsRow.classList.remove('locked');
+  setControlsDisabled(false);
 
   resultArea.className = 'result-success';
   resultArea.innerHTML = '';
@@ -187,6 +204,7 @@ function setStateError(message) {
   btnShorten.disabled = false;
   btnShorten.classList.remove('loading');
   controlsRow.classList.remove('locked');
+  setControlsDisabled(false);
 
   // Sanitise message before inserting as text
   const safeMessage = document.createTextNode(message);
@@ -280,14 +298,22 @@ btnShorten.addEventListener('click', async () => {
     return;
   }
 
-  setStateLoading(selectedService);
+  // Pin the service for this request: a late response must never be recorded
+  // against whatever happens to be selected by the time it lands.
+  const service = getService(selectedService);
+  setStateLoading(service.id);
   try {
-    const shortUrl = await getService(selectedService).shorten(url);
-    cacheSet(url, selectedService, shortUrl);
-    clearPillError(selectedService);
+    const shortUrl = await withTimeout(service.shorten(url), service.name);
+    // Trust boundary: every adapter's return value is a third-party response
+    // that ends up in an <a href>. Validate once, here, for all services.
+    if (typeof shortUrl !== 'string' || !shortUrl.startsWith('https://')) {
+      throw new Error(`${service.name} returned an unusable URL`);
+    }
+    cacheSet(url, service.id, shortUrl);
+    clearPillError(service.id);
     setStateSuccess(shortUrl);
   } catch (err) {
-    markPillError(selectedService);
+    markPillError(service.id);
     setStateError(err.message || 'Something went wrong. Please try again.');
   }
 });
