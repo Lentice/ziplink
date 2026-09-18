@@ -8,6 +8,7 @@ export default {
     let data;
     try { data = JSON.parse(text); } catch { throw new Error(text.trim() || 'Invalid response from is.gd'); }
     if (data?.errorcode) throw new Error(data.errormessage ?? 'Unknown error from is.gd');
+    if (!data?.shorturl) throw new Error('is.gd returned no short URL');
     return data.shorturl;
   }
 };

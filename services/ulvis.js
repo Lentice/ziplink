@@ -5,7 +5,8 @@ export default {
     const endpoint = new URL('https://ulvis.net/api.php');
     endpoint.searchParams.set('url', url);
     endpoint.searchParams.set('private', '1');
-    endpoint.searchParams.set('type', 'json');
+    // Plain-text mode: the response body is the short URL itself. Do not add
+    // type=json without changing the parsing below to match.
 
     const res = await fetch(endpoint);
     if (!res.ok) throw new Error(`Ulvis returned HTTP ${res.status}`);

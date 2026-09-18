@@ -6,7 +6,7 @@ export default {
     if (!res.ok) throw new Error(`da.gd returned HTTP ${res.status}`);
     const text = await res.text();
     const short = text.trim();
-    if (!short.startsWith('http')) throw new Error(short || 'Invalid response from da.gd');
+    if (!short.startsWith('https://')) throw new Error(short || 'Invalid response from da.gd');
     return short;
   }
 };
